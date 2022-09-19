@@ -16,9 +16,9 @@ subject to the following restrictions:
 #include "BasicExample.h"
 
 #include "btBulletDynamicsCommon.h"
-#define ARRAY_SIZE_Y 5
-#define ARRAY_SIZE_X 5
-#define ARRAY_SIZE_Z 5
+#define ARRAY_SIZE_Y 1 
+#define ARRAY_SIZE_X 1
+#define ARRAY_SIZE_Z 1
 
 #include "LinearMath/btVector3.h"
 #include "LinearMath/btAlignedObjectArray.h"
@@ -61,6 +61,16 @@ void BasicExample::initPhysics()
 	//groundShape->initializePolyhedralFeatures();
 	//btCollisionShape* groundShape = new btStaticPlaneShape(btVector3(0,1,0),50);
 
+	//btConvexHullShape* groundShape = new btConvexHullShape();
+	//groundShape->addPoint(btVector3(-50, -50, -50));
+	//groundShape->addPoint(btVector3(-50, -50,  50));
+	//groundShape->addPoint(btVector3(-50,  50, -50));
+	//groundShape->addPoint(btVector3(-50,  50,  50));
+	//groundShape->addPoint(btVector3( 50, -50, -50));
+	//groundShape->addPoint(btVector3( 50, -50,  50));
+	//groundShape->addPoint(btVector3( 50,  50, -50));
+	//groundShape->addPoint(btVector3( 50,  50,  50));
+
 	m_collisionShapes.push_back(groundShape);
 
 	btTransform groundTransform;
@@ -69,16 +79,26 @@ void BasicExample::initPhysics()
 
 	{
 		btScalar mass(0.);
-		createRigidBody(mass, groundTransform, groundShape, btVector4(0, 0, 1, 1));
+		btRigidBody* body = createRigidBody(mass, groundTransform, groundShape, btVector4(0, 0, 1, 1));
+		body->setRestitution(0.9);
 	}
 
 	{
 		//create a few dynamic rigidbodies
 		// Re-using the same collision is better for memory usage and performance
 
-		btBoxShape* colShape = createBoxShape(btVector3(.1, .1, .1));
-
+		//btBoxShape* colShape = createBoxShape(btVector3(.1, .1, .1));
+		btConvexHullShape* colShape = new btConvexHullShape();
+		colShape->addPoint(btVector3(-.1, -.1, -.1));
+		colShape->addPoint(btVector3(-.1, -.1,  .1));
+		colShape->addPoint(btVector3(-.1,  .1, -.1));
+		colShape->addPoint(btVector3(-.1,  .1,  .1));
+		colShape->addPoint(btVector3( .1, -.1, -.1));
+		colShape->addPoint(btVector3( .1, -.1,  .1));
+		colShape->addPoint(btVector3( .1,  .1, -.1));
+		colShape->addPoint(btVector3( .1,  .1,  .1));
 		//btCollisionShape* colShape = new btSphereShape(btScalar(1.));
+		
 		m_collisionShapes.push_back(colShape);
 
 		/// Create Dynamic Objects
@@ -105,7 +125,8 @@ void BasicExample::initPhysics()
 						btScalar(2 + .2 * k),
 						btScalar(0.2 * j)));
 
-					createRigidBody(mass, startTransform, colShape);
+					btRigidBody* body = createRigidBody(mass, startTransform, colShape);
+					body->setRestitution(0.9);
 				}
 			}
 		}
